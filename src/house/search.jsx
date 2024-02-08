@@ -19,27 +19,35 @@ import HouseRow from './houserow';
   //in App component. The useState for this component is defined in App as well.
   //It looks like this:
   // const [searchTerm, setSearchTerm] = React.useState('');
-  const Search = (props) => {
-      //id="search"
-      //label="Search:"
-      //value={searchTerm} //assign name of stateful value created by call to useState() hook
-      //isFocused //pass imperatively a dedicated  prop. isFocused as an attribute is equivalent to isFocused={true}
-      //onInputChange={handleSearch} //assign name of callback handler
-     
-    return (
-      <InputWithLabel
-        id="search"
-        //label="Search:"
-        value={props.searchTerm} //assign name of stateful value created by call to useState() hook
-        isFocused //pass imperatively a dedicated  prop. isFocused as an attribute is equivalent to isFocused={true}
-        onInputChange={props.handleSearch} //assign name of callback handler
-       >
-     <strong>Search with 2 sec delay:</strong> 
-     
-    </InputWithLabel>
-    );
-      
+  const Search = ({
+    id,
+    value,          //this prop was assigned {searchTerm}
+    type = 'text',
+    onInputChange, //this prop was assigned {handleSearch} the callback
+    isFocused,
+    children,
+   }) => { 
+     const inputRef = React.useRef();
+
+     React.useEffect(() => {
+       if (isFocused && inputRef.current) {
+         inputRef.current.focus();
+       }
+     }, [isFocused]);
+
+     return (
+       <>
+         <label htmlFor={id}>{children}</label>
+         &nbsp;
+         <input
+           ref={inputRef}
+           id={id}
+           type={type}
+           value={value}
+           onChange={onInputChange}
+         />
+       </>
+     );
  };
 
-
-export default InputWithLabel;
+export default Search;

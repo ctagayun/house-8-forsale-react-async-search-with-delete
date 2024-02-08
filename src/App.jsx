@@ -27,7 +27,10 @@
 =============================================*/
 
 import * as React from 'react';
-
+import './App.css'
+import Header from "./header";
+import HouseList from './house/houseList';
+import Search from './house/search';
     /*
       At the moment initialStories is unstateful variable
       To gain control over the list, lets make it stateful.
@@ -68,24 +71,7 @@ import * as React from 'react';
       },
     ];
     
-  /* Fetching data. We start off with a function that returns a 
-     promise with data in its shorthand version once it resolves. 
-     Even though the data should arrive asynchronously when we start the 
-     application, it appears to arrive synchronously, because it's rendered 
-     immediately. Let's change this by giving it a bit of a realistic delay.
-     When resolving the promise, delay it for 2 seconds:
-   */
-     const getAsyncStories = () =>
-       new Promise((resolve) =>
-       setTimeout(
-         () => resolve({ data: { stories: initialStories } }),
-         2000
-       )
-     );
- 
-
-
-  /* The following  is a custom hook that will store the state in a 
+      /* The following  is a custom hook that will store the state in a 
      local storage. useStorageState which will keep the component's 
      state in sync with the browser's local storage.
 
@@ -100,21 +86,41 @@ import * as React from 'react';
         2. setSearchTerm renamed to 'setValue'
   */
   const useStorageState = (key, initialState) => {
-     const [value, setValue] = React.useState(
-        localStorage.getItem('key') || initialState 
-     );
-     
-     React.useEffect(() => {
-       console.log('useEffect fired. Displaying value of dependency array ' + [ value, key]  );
-         localStorage.setItem(key, value);  
-        },
-        [value, key]   //Dependency array
-        ); //EOF useEffect
+    const [value, setValue] = React.useState(
+       localStorage.getItem('key') || initialState 
+    );
     
-     //the returned values are returned as an array.
-     return [value, setValue]; 
+    React.useEffect(() => {
+      console.log('useEffect fired. Displaying value of dependency array ' + [ value, key]  );
+        localStorage.setItem(key, value);  
+       },
+       [value, key]   //Dependency array
+       ); //EOF useEffect
+   
+    //the returned values are returned as an array.
+    return [value, setValue]; 
 
-  } //EOF create custom hook
+ } //EOF create custom hook
+
+  /* Fetching data. We start off with a function that returns a 
+     promise with data in its shorthand version once it resolves. 
+     Even though the data should arrive asynchronously when we start the 
+     application, it appears to arrive synchronously, because it's rendered 
+     immediately. Let's change this by giving it a bit of a realistic delay.
+     When resolving the promise, delay it for 2 seconds:
+
+     The "promise" object represents the eventual completion (or failure)
+     of an asynchronouse opepration and its resulting VALUE. Click the link to learn more about "promise"
+     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+   */
+     const getAsyncStories = () =>
+       new Promise((resolve) =>
+       setTimeout(
+         () => resolve({ data: { stories: initialStories } }),
+         2000
+       )
+     );
+ 
   
  const App = () => { 
   const welcome = {
@@ -132,11 +138,14 @@ import * as React from 'react';
     console.log('Value assigned to search term is = ' + searchTerm); 
     console.log('Value assigned tosetSearchTerm is = ' + setSearchTerm); 
 
-    /* Step 1: Since we haven't fetch the data yet, initialized the state with empty 
+    /* Step 1: Since we haven't fetch the data yet, initialize the state with empty 
         array and simulate fetching these stories async. */
     const [stories, setStories] = React.useState([]);
 
-    /*Step 2: Add a new useEffect and call the function and resolve the returned promise */
+    /*Step 2: RESOLVE THE PROMISE AS A SIDE-EFECT
+    We want to start off with an empty list of stories and simulate 
+    fetching these stories asynchronously. In a new useEFFECT hook, call the 
+    function and resolve the returned promise as a side-effect.*/
     React.useEffect(() => {
       //remember the first paramter to useEffect is a function
       getAsyncStories().then(result => {
@@ -173,15 +182,16 @@ import * as React from 'react';
           setSearchTerm(event.target.value); 
         };
 
+      //"story" is the array of stories newly created by the filter() method.
       const searchedStories = stories.filter((story) =>
         story.country.toLowerCase().includes(searchTerm.toLowerCase())
       );
      
       return (
         <>
-          <h1>My Hacker Stories</h1>
+          <Header  headerText={welcome} />
     
-           <InputWithLabel
+           <Search 
              id="search"
              //label="Search:"
              value={searchTerm} //assign name of stateful value created by call to useState() hook
@@ -190,15 +200,15 @@ import * as React from 'react';
             >
             <strong>Search with 2 sec delay:</strong> 
             
-           </InputWithLabel>
+           </Search>
           <hr />
           
-          <List list={searchedStories} onRemoveItem = {handleRemoveStory}/> 
+          <HouseList list={searchedStories} onRemoveItem = {handleRemoveStory}/> 
         </>
       );
     }
     
-    const InputWithLabel = ({
+    /*const Search = ({
        id,
        value,          //this prop was assigned {searchTerm}
        type = 'text',
@@ -228,6 +238,7 @@ import * as React from 'react';
           </>
         );
     };
+    */
     
    /*
      Instantiate Item component. Pass three props:
@@ -243,13 +254,13 @@ import * as React from 'react';
      the actual event:
 
    */
-   const List = ({list, onRemoveItem}) => ( 
-    <ul>
-       {list.map((item) => (
-         <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
-       ))}
-    </ul>
-  ); //EOF
+  //  const List = ({list, onRemoveItem}) => ( 
+  //   <ul>
+  //      {list.map((item) => (
+  //        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem} />
+  //      ))}
+  //   </ul>
+  //); //EOF
      
  
   /*
@@ -265,7 +276,7 @@ import * as React from 'react';
    </button>
  
   */
-  const Item = ({item, onRemoveItem}) => (   
+ /* const Item = ({item, onRemoveItem}) => (   
     <li>
       <span>{item.objectID}</span>
       <span>{item.address}</span>
@@ -277,7 +288,7 @@ import * as React from 'react';
        </button>
       </span>
     </li>
-  );   
+  );   */
 
     
 export default App;

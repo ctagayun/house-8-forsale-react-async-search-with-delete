@@ -6,7 +6,7 @@ import currencyFormatter from "../helpers/currencyFormatter";
 //each 'house' record
 const HouseRow = ({house, onRemoveItem }) => (
     <tr>
-     <td>{house.id}</td>
+     <td>{house.objectID}</td>
      <td>{house.address}</td>
      <td>{house.country}</td>
      <td>{currencyFormatter.format(house.price)}</td>
